@@ -4,20 +4,18 @@ game 'gta5'
 
 author 'ranran_dxd'
 
-description 'Store Robbery Script'
+description 'A Collection of minigame by ranran_dxd'
 
 client_scripts {
-    'client/main.lua'
+    'client/*.lua'
 }
 
-shared_scripts {
-    '@ox_lib/init.lua',
-    'config.lua'
-}
+ui_page 'html/index.html'
 
-server_scripts {
-    'server/main.lua'
+files {
+    'html/index.html',
+    'html/js/index.js',
+    'html/assets/index.css'
 }
-
 
 lua54 'yes'
