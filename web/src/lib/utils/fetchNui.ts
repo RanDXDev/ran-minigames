@@ -17,7 +17,7 @@ export async function fetchNui<T = any>(
     body: JSON.stringify(data),
   };
 
-  const resp = await fetch(`https://ran-ui/${eventName}`, options);
+  const resp = await fetch(`https://ran-minigames/${eventName}`, options);
 
   return await resp.json();
 }

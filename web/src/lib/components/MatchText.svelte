@@ -1,13 +1,16 @@
 <script lang="ts">
-  import { TerminalData, TerminalSetting } from "$store/matchTerminal";
+  import { TerminalSetting } from "$store/matchTerminal";
   import { debugData } from "$utils/debugData";
   import { useNuiEvent } from "$utils/useNuiEvent";
   import randomname from "$utils/randomGeek.json";
   import { onDestroy, onMount } from "svelte";
+  import { fetchNui } from "$utils/fetchNui";
 
   /**
    * TODO: WILL REWRITE IT SOON SO MESSY A
    */
+
+  let Terminal: DataObject[] = [];
 
   function generateRandomGeekName(): string {
     const randomIndex: number = Math.floor(Math.random() * randomname.length);
@@ -106,14 +109,6 @@
     return array;
   }
 
-  $: $TerminalData,
-    (() => {
-      if ($TerminalData.length) {
-        data1 = GetData(1);
-        data2 = GetData(2);
-        data3 = GetData(3);
-      }
-    })();
   let data1: DataObject[] = [];
   let selected1 = 0;
   let solved1 = false;
@@ -124,36 +119,25 @@
   let selected3 = 0;
   let solved3 = false;
   let allsolved = false;
+  let dataNeed: DataObject;
 
-  let dataNeed = GetNeeded();
   function GetData(id: number): DataObject[] {
-    const leData = $TerminalData;
+    const leData = Terminal;
     const leShuffled = shuffleArray(leData);
-    const leObj = leShuffled.find((x) => x.needed.id == id);
+    const leObj = leShuffled.find((x) => x.needed.id == id && !x.solved);
     const leFinale = [
       ...leShuffled.filter((x) => x.needed.id !== id).slice(0, 19),
       leObj,
     ];
-
     return shuffleArray(leFinale);
   }
 
   function SolvedAll() {
-    let i = 0;
-    $TerminalData.forEach((x) => {
-      if (x.needed.id !== -1 && x.solved) {
-        i += 1;
-      }
-    });
-    return i === 3;
+    return solved1 && solved2 && solved3;
   }
 
   function GetNeeded() {
-    const f = $TerminalData.filter((x) => x.needed.id !== -1 && !x.solved);
-    if (f && f.length) {
-      return f[0];
-    } else {
-    }
+    return Terminal.find((x) => x.needed.id !== -1 && !x.solved);
   }
 
   function Up() {
@@ -178,7 +162,7 @@
 
   function ResetData() {
     TerminalSetting.set({ value: false });
-    TerminalData.set([]);
+    Terminal = [];
     data1 = [];
     data2 = [];
     data3 = [];
@@ -192,13 +176,11 @@
   }
 
   function SetSolved(id) {
-    TerminalData.update((x) => {
-      x.find((y) => y.needed.id == id).solved = true;
-      return x;
-    });
+    Terminal.find((x) => x.needed.id == id).solved = true;
+
     if (SolvedAll()) {
       allsolved = true;
-      setTimeout(ResetData, 2000);
+      fetchNui("terminal-done").then(ResetData);
     } else {
       dataNeed = GetNeeded();
     }
@@ -229,6 +211,7 @@
   let selected = 1;
   function KeyPress(event: KeyboardEvent) {
     if (!$TerminalSetting.value) return;
+    event.preventDefault();
     switch (event.key) {
       case "ArrowLeft":
         if (selected - 1 !== 0) {
@@ -274,7 +257,7 @@
   function OpenTerminal(data) {
     TerminalSetting.set({ value: data.value });
     if (data.value) {
-      TerminalData.set(generateData());
+      Terminal = generateData();
       data1 = GetData(1);
       data2 = GetData(2);
       data3 = GetData(3);
@@ -292,6 +275,9 @@
   });
 </script>
 
+<!-- <p class="text-xl text-white">
+  {dataNeed?.needed?.id}
+</p> -->
 {#if $TerminalSetting.value}
   <div class="match">
     <div
@@ -301,7 +287,7 @@
     </div>
 
     <div class="flex justify-between mt-5">
-      {#if $TerminalData.length}
+      {#if Terminal.length}
         <div class="box" class:selected={selected == 1} class:solved={solved1}>
           {#if solved1}
             <h1

@@ -4,6 +4,7 @@
   import { fetchNui } from "$utils/fetchNui";
   import { isEnvBrowser } from "$utils/misc";
   import { useNuiEvent } from "$utils/useNuiEvent";
+  import { onDestroy, onMount } from "svelte";
 
   import { backOut } from "svelte/easing";
   import { fade, scale } from "svelte/transition";
@@ -127,6 +128,7 @@
       position: "center",
     });
     bomb = 0;
+    moneyGet = 0;
   }
   function SendData() {
     fetchNui("minesweep-cashout", moneyGet)
@@ -138,10 +140,19 @@
   }
 
   $: bomb, checkBomb();
-  $: $sweepStore,
-    (() => {
-      console.log($sweepStore);
-    })();
+
+  function KeyPressed(event: KeyboardEvent) {
+    if (!$sweepData.value) return;
+    if (event.key === "Escape") {
+      fetchNui("exit").then(reset);
+    }
+  }
+  onMount(() => {
+    window.addEventListener("keydown", KeyPressed);
+  });
+  onDestroy(() => {
+    window.removeEventListener("keydown", KeyPressed);
+  });
 </script>
 
 {#if $sweepData.value}
@@ -177,7 +188,6 @@
                 bomb += 1;
                 moneyGet -= Math.round((moneyGet * 30) / 100);
               }
-              console.log(isbomb, money, clicked);
             }}
           >
             {#if clicked}

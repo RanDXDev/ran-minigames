@@ -50,18 +50,20 @@
 </script>
 
 <div class="w-scren h-screen" class:bg-slate-950={isEnvBrowser()}>
-  <div class="flex gap-5">
-    {#each minigameList as minigame}
-      <button
-        class="bg-blue-500 p-5"
-        on:click={() => {
-          MinigameStart(minigame);
-        }}
-      >
-        {minigame}
-      </button>
-    {/each}
-  </div>
+  {#if isEnvBrowser()}
+    <div class="flex gap-5">
+      {#each minigameList as minigame}
+        <button
+          class="bg-blue-500 p-5"
+          on:click={() => {
+            MinigameStart(minigame);
+          }}
+        >
+          {minigame}
+        </button>
+      {/each}
+    </div>
+  {/if}
   <MatchText />
   <Sweeper />
   <MemoryCard />

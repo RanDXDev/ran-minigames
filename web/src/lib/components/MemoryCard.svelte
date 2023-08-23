@@ -3,7 +3,7 @@
   import { fetchNui } from "$utils/fetchNui";
   import { delay, isEnvBrowser } from "$utils/misc";
   import { useNuiEvent } from "$utils/useNuiEvent";
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { flip } from "svelte/animate";
   import { backOut, sineOut } from "svelte/easing";
   import { fade, fly, scale } from "svelte/transition";
@@ -133,6 +133,7 @@
   function resetMinigame() {
     data.value = false;
     data.timer = undefined;
+    allmatch = false;
     MemoryCard.set([]);
   }
 
@@ -152,9 +153,11 @@
     });
     if (l <= d) {
       allmatch = true;
-      fetchNui("memory-game", resetMinigame).catch(() => {
-        if (isEnvBrowser()) resetMinigame();
-      });
+      fetchNui("memory-game", true)
+        .then(resetMinigame)
+        .catch(() => {
+          if (isEnvBrowser()) resetMinigame();
+        });
     }
   }
 
@@ -170,17 +173,29 @@
     }, 5000);
   }
 
-  onMount(() => {});
+  function KeyPress(event: KeyboardEvent) {
+    if (!data.value) return;
+    if (event.key == "Escape") {
+      fetchNui("memory-exit")
+        .then(resetMinigame)
+        .catch(() => {
+          if (!isEnvBrowser()) return;
+          resetMinigame();
+        });
+    }
+  }
+  onMount(() => {
+    window.addEventListener("keydown", KeyPress);
+  });
+  onDestroy(() => {
+    window.removeEventListener("keydown", KeyPress);
+  });
   $: [firstselected, secondselected], IsMatched();
   $: $MemoryCard, CheckAllMatch();
 </script>
 
 {#if data.value}
-  <div
-    class="memory-card"
-    in:scale={{ duration: 400, easing: backOut }}
-    out:fade={{ duration: 100 }}
-  >
+  <div class="memory-card" in:fly={{ y: 100 }} out:fade={{ duration: 100 }}>
     {#if $Initializing}
       <div
         transition:fade
@@ -203,7 +218,10 @@
               disabled={allmatch || $Initializing}
               on:click={() => {
                 if (isMatched) return;
-                if (!firstselected) {
+                if (firstselected && firstselected == id) {
+                  isFlipped = false;
+                  firstselected = undefined;
+                } else if (!firstselected) {
                   firstselected = id;
                   isFlipped = !isFlipped;
                 } else if (!secondselected) {
