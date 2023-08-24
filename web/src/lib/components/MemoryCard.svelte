@@ -176,7 +176,7 @@
   function KeyPress(event: KeyboardEvent) {
     if (!data.value) return;
     if (event.key == "Escape") {
-      fetchNui("memory-exit")
+      fetchNui("memory-exit", false)
         .then(resetMinigame)
         .catch(() => {
           if (!isEnvBrowser()) return;

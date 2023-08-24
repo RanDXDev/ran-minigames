@@ -4,6 +4,8 @@
 
 #### Memory Card Minigame
 
+![MemoryMinigame](.github/assets/memorygame.png)
+
 ```lua
 ---time is optional, time is in minute
 --[[
@@ -20,7 +22,9 @@ end
 
 #### Mine Sweep Minigame
 
-Usually use it in a robbery script like story robbery
+Usually use it in a robbery script like my [store robbery](https://github.com/RanDXDev/ran-storerobbery)
+
+![minesweep](.github/assets/sweeper.png)
 
 ```lua
 --[[
@@ -36,6 +40,22 @@ exports['ran-minigames']:MineSweep(money, bomb, bombfail, position)
 local success = exports['ran-minigames']:MineSweep(12000, 12, 3, "center")
 -- Will return amount of money we get from minigame
 print(success)
+```
+
+#### Terminal Text
+
+I don't really know what to name this one 🥲, but the way it work is you need to find the same text on the right, in example I have to find `UX` and has a content `HACK, 404, CLI,... ETC`
+
+![terminal](.github/assets/terminal.png)
+
+```lua
+--[[
+    WILL RETURN A BOOLEAN
+]]
+ exports['ran-minigames']:OpenTerminal()
+
+ -- EXAMPLE
+ local success = exports['ran-minigames']:OpenTerminal()
 ```
 
 ### Support
