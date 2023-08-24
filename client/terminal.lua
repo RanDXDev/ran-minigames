@@ -13,13 +13,13 @@ end
 
 exports("OpenTerminal", OpenTerminal)
 
-RegisterNUICallback("exit-terminal", function(body, cb)
+RegisterNUICallback("exit-terminal", function(_, cb)
     cb(0)
     SetNuiFocus(false, false)
     pnis:resolve(false)
 end)
 
-RegisterNUICallback("terminal-done", function(body, cb)
+RegisterNUICallback("terminal-done", function(_, cb)
     cb(0)
     SetNuiFocus(false, false)
     pnis:resolve(true)

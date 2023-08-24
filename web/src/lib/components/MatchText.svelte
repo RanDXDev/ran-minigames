@@ -5,6 +5,7 @@
   import randomname from "$utils/randomGeek.json";
   import { onDestroy, onMount } from "svelte";
   import { fetchNui } from "$utils/fetchNui";
+  import { isEnvBrowser } from "$utils/misc";
 
   /**
    * TODO: WILL REWRITE IT SOON SO MESSY A
@@ -250,6 +251,14 @@
         break;
       case "Space":
         CheckMatch();
+        break;
+      case "Escape":
+        fetchNui("exit-terminal")
+          .then(ResetData)
+          .catch(() => {
+            if (!isEnvBrowser()) return;
+            ResetData();
+          });
         break;
     }
   }
