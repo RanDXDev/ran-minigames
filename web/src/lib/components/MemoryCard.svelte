@@ -5,9 +5,11 @@
   import { useNuiEvent } from "$utils/useNuiEvent";
   import { onDestroy, onMount } from "svelte";
   import { flip } from "svelte/animate";
-  import { backOut, sineOut } from "svelte/easing";
+  import { backOut, quadInOut, sineOut } from "svelte/easing";
+  import { tweened } from "svelte/motion";
   import { fade, fly, scale } from "svelte/transition";
 
+  let test;
   interface Card {
     id: number;
     icon: string;
@@ -73,7 +75,7 @@
   MemoryCard.set(generateMemoryCardData(iconNames));
 
   let allmatch = false;
-
+  let timeoutID;
   function HideAll() {
     MemoryCard.update((x) => {
       x.forEach((y) => {
@@ -81,8 +83,24 @@
       });
       return x;
     });
-
     Initializing.set(false);
+    if (data.timer) {
+      test = tweened(100, {
+        duration: 1000 * data.timer,
+        easing: quadInOut,
+      });
+      test.set(0);
+      timeoutID = setTimeout(() => {
+        if (!allmatch) {
+          fetchNui("memory-game", false)
+            .then(resetMinigame)
+            .catch(() => {
+              if (!isEnvBrowser()) return;
+              resetMinigame();
+            });
+        }
+      }, 1000 * data.timer);
+    }
   }
 
   async function IsMatched() {
@@ -134,6 +152,7 @@
     data.value = false;
     data.timer = undefined;
     allmatch = false;
+    test = undefined;
     MemoryCard.set([]);
   }
 
@@ -161,6 +180,7 @@
     }
   }
 
+  
   function initMemoryGame(d) {
     Initializing.set(true);
     data = d;
@@ -242,6 +262,15 @@
         {/each}
       </div>
     </div>
+    {#if data?.timer && test}
+      <div class="absolute bottom-0 left-0 h-2 w-full overflow-hidden">
+        <div
+          class=" h-full bg-green-300"
+          class:bg-red-400={$test <= 20}
+          style="width: {$test}%;"
+        />
+      </div>
+    {/if}
   </div>
 {/if}
 

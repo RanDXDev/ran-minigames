@@ -7,7 +7,7 @@
 ![MemoryMinigame](.github/assets/memorygame.png)
 
 ```lua
----time is optional, time is in minute
+---time is optional, time is in seconds
 --[[
     return: boolean
 ]]
