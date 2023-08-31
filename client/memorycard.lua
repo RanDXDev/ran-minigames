@@ -27,8 +27,3 @@ RegisterNUICallback("memory-exit", function(data, cb)
     cb(0)
     pnis:resolve(data)
 end)
-
-RegisterCommand("memory-game", function()
-    local s = exports['ran-minigames']:MemoryCard()
-    print(s)
-end, false)

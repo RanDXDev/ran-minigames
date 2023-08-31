@@ -30,12 +30,3 @@ RegisterNUICallback("exit", function(data, cb)
     cb(0)
     pnis:resolve(false)
 end)
-
-local function TestMinigame()
-    local success = exports['ran-minigames']:MineSweep(12000, 12, 3, "center")
-    print(success)
-end
-
-RegisterCommand("test-mingame", function()
-    TestMinigame()
-end, false)
